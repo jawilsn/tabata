@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabata Timer with Sound</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    img {
+      width: 200px;
+      margin-bottom: 20px;
+    }
+    .timer-display {
+      font-size: 3em;
+      margin: 20px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+    input {
+      width: 50px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <img src="https://premiumathletes.com/images/logo.png" alt="Premium Athletes Logo">
+
+  <!-- Timer Display -->
+  <div class="timer-display" id="timerDisplay">00:20</div>
+
+  <!-- Timer Controls -->
+  <div class="controls">
+    <button onclick="startTimer()">Start</button>
+    <button onclick="resetTimer()">Reset</button>
+  </div>
+
+  <!-- Timer Settings -->
+  <div class="controls">
+    <label for="workTime">Work (sec):</label>
+    <input type="number" id="workTime" value="20" min="1">
+    
+    <label for="restTime">Rest (sec):</label>
+    <input type="number" id="restTime" value="10" min="1">
+    
+    <label for="intervalCount">Intervals:</label>
+    <input type="number" id="intervalCount" value="8" min="1">
+  </div>
+
+  <!-- Audio Elements for Sounds -->
+  <audio id="startSound" src="https://example.com/start-sound.mp3"></audio>
+  <audio id="restSound" src="https://example.com/rest-sound.mp3"></audio>
+
+  <script>
+    let timer;
+    let timeRemaining;
+    let currentInterval;
+    let isWorkInterval;
+
+    function startTimer() {
+      // Fetch settings
+      const workTime = parseInt(document.getElementById("workTime").value);
+      const restTime = parseInt(document.getElementById("restTime").value);
+      const intervalCount = parseInt(document.getElementById("intervalCount").value);
+
+      // Initialize timer variables
+      timeRemaining = workTime;
+      currentInterval = 0;
+      isWorkInterval = true;
+
+      // Play start sound
+      document.getElementById("startSound").play();
+      
+      // Display initial time
+      updateDisplay();
+
+      // Clear any existing timer
+      clearInterval(timer);
+
+      // Start countdown
+      timer = setInterval(() => {
+        if (timeRemaining > 0) {
+          timeRemaining--;
+          updateDisplay();
+        } else {
+          // Switch intervals
+          currentInterval++;
+          if (currentInterval < intervalCount) {
+            isWorkInterval = !isWorkInterval;
+            timeRemaining = isWorkInterval ? workTime : restTime;
+            
+            // Play the appropriate sound
+            if (isWorkInterval) {
+              document.getElementById("startSound").play();
+            } else {
+              document.getElementById("restSound").play();
+            }
+            
+            updateDisplay();
+          } else {
+            clearInterval(timer);
+            alert("Tabata workout complete!");
+          }
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      clearInterval(timer);
+      document.getElementById("timerDisplay").style.color = "white";
+      document.getElementById("timerDisplay").textContent = "00:20";
+    }
+
+    function updateDisplay() {
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      document.getElementById("timerDisplay").textContent = 
+        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById("timerDisplay").style.color = isWorkInterval ? "white" : "green";
+    }
+  </script>
+</body>
+</html>
